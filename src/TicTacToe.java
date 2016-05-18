@@ -16,7 +16,7 @@ public class TicTacToe extends JFrame implements ActionListener{
 	public TicTacToe(String title){
 		super(title);
 
-		tiles = new Tiles[5][5];
+		tiles = new Tiles[3][3];
 		frame = this;
 
 		Container container = getContentPane();
@@ -29,6 +29,9 @@ public class TicTacToe extends JFrame implements ActionListener{
 				container.add(tiles[i][j]);
 			}
 		}
+
+		tiles[2][2].doClick();
+		AlphaBetaPruning();
 
 		setPreferredSize(new Dimension(300, 300));
 		pack();
@@ -76,6 +79,8 @@ public class TicTacToe extends JFrame implements ActionListener{
 		TURN = TURN == TURN1
 			? TURN2
 			: TURN1;
+
+		getGameState().print();
 	}
 
 	public String isGoalState(int x, int y){
@@ -98,6 +103,52 @@ public class TicTacToe extends JFrame implements ActionListener{
 		}
 		TURN_COUNT = 0;
 		TURN = TURN1;
+	}
+
+	public State getGameState(){
+		int[][] temp = new int[3][3];
+		for (int i=0 ; i<3 ; i++ ){
+			for(int j=0; j<3 ; j++){
+				switch(tiles[i][j].getText()){
+					case "X":
+						temp[i][j] = 1;
+						break;
+					case "O":
+						temp[i][j] = 2;
+						break;
+					case "":
+						temp[i][j] = 0;
+						break;
+				}
+			}
+		}
+		return new State(temp,null);
+	}
+
+	public void AlphaBetaPruning(){
+		ArrayList<State> game_tree = new ArrayList<State>();
+
+		int turn_count = TURN_COUNT;
+
+		State init = getGameState();
+
+		Point curr_action;
+
+		int player = 0;
+
+		while(turn_count!=9){
+			player = turn_count%2;
+			init = init.getNextState(init.getAction().removeFirst(),player);
+			init.print();
+
+			System.out.println(init.getValue(turn_count));
+
+			turn_count++;
+
+
+
+		}
+
 	}
 
 	public static void main(String[] args) {
