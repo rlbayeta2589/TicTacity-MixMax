@@ -1,3 +1,4 @@
 #!/bin/bash
 
-javac -d /bin /src/*.java
+javac -d . src/*.java
+java -cp . TicTacToe
