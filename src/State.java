@@ -13,7 +13,7 @@ public class State{
 	public State(int[][] state, int player) {
 	    this.state = new int[3][3];
 		this.parent = null;
-	    this.player = player;
+	    this.player = player *-1;
         this.type   = player; 
 
         for (int i = 0; i < 3; i++) {

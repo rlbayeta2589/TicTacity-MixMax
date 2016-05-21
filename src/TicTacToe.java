@@ -67,6 +67,16 @@ public class TicTacToe extends JFrame implements ActionListener{
                      best_state_index = i;
                 }
             }
+            
+            
+            
+
+            System.out.println("POSSIBLE MOVES");
+            for (State s : GAME.getSuccessors()) {
+                s.print();
+            }
+            
+            System.out.println(best_state_index);
 
             best_state =  GAME.getSuccessors().get(best_state_index);
 
