@@ -65,8 +65,8 @@ public class State{
     }
 
     private int advantage(int x, int o){
-        if(x==3) return 1;
-        if(o==3) return -1;
+        if(x==3) return 2;
+        if(o==3) return -2;
         if(x>0 && o==0) return 1;
         if(o>0 && x==0) return -1;
         else return 0;
@@ -93,8 +93,8 @@ public class State{
 
             value = advantage(pX,pO);
 
-            if(value==1) adv_X++;
-            if(value==-1) adv_O++;
+            if(value>0) adv_X+=value;
+            if(value<0) adv_O+=(value*-1);
 
         }
 
@@ -112,8 +112,8 @@ public class State{
 
             value = advantage(pX,pO);
 
-            if(value==1) adv_X++;
-            if(value==-1) adv_O++;
+            if(value>0) adv_X+=value;
+            if(value<0) adv_O+=(value*-1);
         }
 
         pX = 0;
@@ -129,8 +129,8 @@ public class State{
 
          value = advantage(pX,pO);
 
-        if(value==1) adv_X++;
-        if(value==-1) adv_O++;
+        if(value>0) adv_X+=value;
+            if(value<0) adv_O+=(value*-1);
 
         pX = 0;
         pO = 0;
@@ -145,10 +145,10 @@ public class State{
 
         value = advantage(pX,pO);
 
-        if(value==1) adv_X++;
-        if(value==-1) adv_O++;
+        if(value>0) adv_X+=value;
+            if(value<0) adv_O+=(value*-1);
 
-        if(adv_X == adv_O) return player==1 ? adv_X*player*-1 : adv_O*player*-1; //o player * -1 // basta kung sino na yung titira
+        if(adv_X == adv_O) return adv_X*player*-1; //o player * -1 // basta kung sino na yung titira
                                             //siya yung may advantage
         return adv_X > adv_O ? adv_X : adv_O*-1;
     }
