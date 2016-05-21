@@ -27,7 +27,7 @@ public class State{
         this.state  = new int[3][3];
 		this.parent = parent;
 	    this.player = player;
-        this.type   = player; //or *-1?
+        this.type   = player; 
         this.turn   = action;
 
         x = (int) action.getX();
@@ -55,6 +55,14 @@ public class State{
         return type;
     }
 
+    public Point getTurn() {
+        return turn;
+    }
+
+    public int getUtility() {
+        return utility;
+    }
+
     public int value(int depth, int alpha, int beta) {
         if(getType() ==  0) {
             parent.utility = utility;
@@ -78,8 +86,8 @@ public class State{
         for(State next : generateSuccessors()) {
             value = Math.max(value, next.value(depth+1, alpha, beta));
 
-            if(value >= beta) return value;
-            alpha = Math.max(alpha, value);
+            //if(value >= beta) return value;
+            //alpha = Math.max(alpha, value);
         }
 
         return value;
@@ -91,8 +99,8 @@ public class State{
         for(State next : generateSuccessors()) {
             value = Math.min(value, next.value(depth+1, alpha, beta));
 
-            if(value <= alpha) return value;
-            beta = Math.min(beta, value);
+            //if(value <= alpha) return value;
+            //beta = Math.min(beta, value);
         }
 
         return value;
@@ -149,20 +157,20 @@ public class State{
                 if(state[i][j] == 0) actions.add(new Point(i,j));
             }
         }
-
+    
         return actions;
     }
 
 	public void print() {
-		for (int i=0 ; i<3 ; i++ ){
+		/*for (int i=0 ; i<3 ; i++ ){
 			for(int j=0; j<3 ; j++){
 				System.out.print(this.state[i][j] + " ");
 			}
 			System.out.println();
 		}
 			System.out.println("TURN " + player + ": @ " + turn.getX() + ", " + turn.getY());
-			System.out.println(type == 0 ? "UTILITY NODE" : type == 1 ? "MAXIMIZATION" : "MINIMIZATION");
 			System.out.println("UTILITY: " + utility);
             System.out.println();
+            */
 	}
 }
