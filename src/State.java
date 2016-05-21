@@ -139,6 +139,8 @@ public class State{
         if(value==1) adv_X++;
         if(value==-1) adv_O++;
 
+        if(adv_X == adv_O) return player;//o player * -1 // basta kung sino na yung titira
+                                            //siya yung may advantage
         return adv_X > adv_O ? 1 : -1;
     }
 
