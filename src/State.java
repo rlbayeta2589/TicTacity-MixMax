@@ -55,6 +55,89 @@ public class State{
         return type;
     }
 
+    private int advantage(int x, int o){
+        if(x>0 && o==0) return 1;
+        if(o>0 && x==0) return -1;
+        else return 0;
+    }
+
+    public int evaluateBoard() {
+        int adv_X = 0;
+        int adv_O = 0;
+        int pX = 0;
+        int pO = 0; 
+        int value;
+
+        for (int i = 0; i < 3; ++i) {
+            pX = 0;
+            pO = 0;
+            for (int j = 0; j < 3; ++j) {
+                if (state[i][j] == 1) {
+                    pX++;
+                } else if (state[i][j]==-1) {
+                    pO++;
+                }
+            } 
+
+            value = advantage(x,o);
+
+            if(value==1) adv_X++;
+            if(value==-1) adv_O++;
+
+        }
+
+        for (int j = 0; j < 3; ++j) {
+            pX = 0;
+            pO = 0;
+            for (int i = 0; i < 3; ++i) {
+                if (state[i][j] == 1) {
+                    pX++;
+                } else if (state[i][j]==-1) {
+                    pO++;
+                }
+            }
+
+            value = advantage(x,o);
+
+            if(value==1) adv_X++;
+            if(value==-1) adv_O++;
+        }
+
+        pX = 0;
+        pO = 0;
+
+        for (int i = 0, j = 0; i < 3; ++i, ++j) {
+            if (state[i][j] == 1) {
+                pX++;
+            } else if (state[i][j]==-1) {
+                pO++;
+            }
+        }
+
+         value = advantage(x,o);
+
+        if(value==1) adv_X++;
+        if(value==-1) adv_O++;
+
+        pX = 0;
+        pO = 0;
+
+        for (int i = 2, j = 0; i > -1; --i, ++j) {
+            if (state[i][j] == 1) {
+                pX++;
+            } else if (state[i][j]==-1) {
+                pO++;
+            }
+        }
+
+         value = advantage(x,o);
+
+        if(value==1) adv_X++;
+        if(value==-1) adv_O++;
+
+        return adv_X > adv_O ? 1 : -1;
+    }
+
     public int value(int depth, int alpha, int beta) {
         if(getType() ==  0) {
             parent.utility = utility;
