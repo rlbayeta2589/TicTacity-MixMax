@@ -30,8 +30,6 @@ public class TicTacToe extends JFrame implements ActionListener{
 			}
 		}
 
-        tiles[1][1].doClick();
-
         State init = getGameState();
         
         System.out.println(init.value(0, -100, 100));
