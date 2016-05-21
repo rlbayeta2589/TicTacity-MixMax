@@ -40,9 +40,10 @@ public class State{
             }
         }
 
+        utility=evaluateBoard();
+     
         if (winner(x,y) != 0) {
             type = 0;
-            utility = player;
         }
 
     }
@@ -63,10 +64,101 @@ public class State{
         return utility;
     }
 
+    private int advantage(int x, int o){
+        if(x==3) return 1;
+        if(o==3) return -1;
+        if(x>0 && o==0) return 1;
+        if(o>0 && x==0) return -1;
+        else return 0;
+    }
+
+    public int evaluateBoard() {
+        int adv_X = 0;
+        int adv_O = 0;
+        int pX = 0;
+        int pO = 0; 
+        int value;
+
+        //rows
+        for (int i = 0; i < 3; ++i) {
+            pX = 0;
+            pO = 0;
+            for (int j = 0; j < 3; ++j) {
+                if (state[i][j] == 1) {
+                    pX++;
+                } else if (state[i][j]==-1) {
+                    pO++;
+                }
+            } 
+
+            value = advantage(pX,pO);
+
+            if(value==1) adv_X++;
+            if(value==-1) adv_O++;
+
+        }
+
+        //cols
+        for (int j = 0; j < 3; ++j) {
+            pX = 0;
+            pO = 0;
+            for (int i = 0; i < 3; ++i) {
+                if (state[i][j] == 1) {
+                    pX++;
+                } else if (state[i][j]==-1) {
+                    pO++;
+                }
+            }
+
+            value = advantage(pX,pO);
+
+            if(value==1) adv_X++;
+            if(value==-1) adv_O++;
+        }
+
+        pX = 0;
+        pO = 0;
+
+        for (int i = 0, j = 0; i < 3; ++i, ++j) {
+            if (state[i][j] == 1) {
+                pX++;
+            } else if (state[i][j]==-1) {
+                pO++;
+            }
+        }
+
+         value = advantage(pX,pO);
+
+        if(value==1) adv_X++;
+        if(value==-1) adv_O++;
+
+        pX = 0;
+        pO = 0;
+
+        for (int i = 2, j = 0; i > -1; --i, ++j) {
+            if (state[i][j] == 1) {
+                pX++;
+            } else if (state[i][j]==-1) {
+                pO++;
+            }
+        }
+
+        value = advantage(pX,pO);
+
+        if(value==1) adv_X++;
+        if(value==-1) adv_O++;
+
+        if(adv_X == adv_O) return player==1 ? adv_X*player*-1 : adv_O*player*-1; //o player * -1 // basta kung sino na yung titira
+                                            //siya yung may advantage
+        return adv_X > adv_O ? adv_X : adv_O*-1;
+    }
+
     public int value(int depth, int alpha, int beta) {
         if(getType() ==  0) {
-            parent.utility = utility;
-            return utility;
+            int s = evaluateBoard();
+            parent.utility = s;
+            System.out.println("EVAL" + s);
+            return s;
         }
 
         if(getType() ==  1) {
@@ -81,26 +173,26 @@ public class State{
     }
 
     public int maxValue(int depth, int alpha, int beta) {
-        int value = -100;
+        int value = -1000;
 
         for(State next : generateSuccessors()) {
             value = Math.max(value, next.value(depth+1, alpha, beta));
-
-            //if(value >= beta) return value;
-            //alpha = Math.max(alpha, value);
+/*
+            if(value >= beta) return value;
+            alpha = Math.max(alpha, value);*/
         }
 
         return value;
     }
 
     public int minValue(int depth, int alpha, int beta) {
-        int value = 100;
+        int value = 1000;
 
         for(State next : generateSuccessors()) {
             value = Math.min(value, next.value(depth+1, alpha, beta));
-
-            //if(value <= alpha) return value;
-            //beta = Math.min(beta, value);
+/*
+            if(value <= alpha) return value;
+            beta = Math.min(beta, value);*/
         }
 
         return value;
@@ -121,7 +213,7 @@ public class State{
 
                 successors.add(child);
 
-                child.print();
+                //child.print();
             }
         }
 
@@ -133,12 +225,12 @@ public class State{
     }
 
     public int winner(int x, int y) {
-        if( state[x][0] == state[x][1] && state[x][0] == state[x][2] ) return state[x][y];
-		if( state[0][y] == state[1][y] && state[0][y] == state[2][y] ) return state[x][y];
+        if( state[x][0] == state[x][1] && state[x][0] == state[x][2] && state[x][0]!=0) return state[x][y];
+		if( state[0][y] == state[1][y] && state[0][y] == state[2][y] && state[0][y]!=0 ) return state[x][y];
 
 		if( (x+y) % 2 ==0 ){
-			if ( x+y==2 && state[0][2] == state[1][1] && state[0][2] == state[2][0] ) return state[x][y];
-			if ( x==y && state[0][0] == state[1][1] && state[0][0] == state[2][2] ) return state[x][y];
+			if ( x+y==2 && state[0][2] == state[1][1] && state[0][2] == state[2][0] && state[0][2]!=0 ) return state[x][y];
+			if ( x==y && state[0][0] == state[1][1] && state[0][0] == state[2][2]  && state[0][0]!=0) return state[x][y];
 		}
 
 		return 0;
@@ -162,7 +254,7 @@ public class State{
     }
 
 	public void print() {
-		/*for (int i=0 ; i<3 ; i++ ){
+		for (int i=0 ; i<3 ; i++ ){
 			for(int j=0; j<3 ; j++){
 				System.out.print(this.state[i][j] + " ");
 			}
@@ -171,6 +263,6 @@ public class State{
 			System.out.println("TURN " + player + ": @ " + turn.getX() + ", " + turn.getY());
 			System.out.println("UTILITY: " + utility);
             System.out.println();
-            */
+            
 	}
 }

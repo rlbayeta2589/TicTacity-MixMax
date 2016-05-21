@@ -36,20 +36,20 @@ public class TicTacity {
 
             State game = new State(tiles, null, new Point(x,y), 1);
 
-            System.out.println(game.value(0, -100, 100));
+            System.out.println(game.value(0, -1000, 1000));
 
-        /*
+        
             System.out.println("POSSIBLE MOVES!");
 
             for(State child : game.getSuccessors()) {
                 child.print();
             }
             System.out.println();
-        */
+        
 
             chosen_one = 0;
-            for(int i = 1; i < game.getSuccessors().size(); i++) {
-                if (game.getSuccessors().get(chosen_one).getUtility() > game.getSuccessors().get(i).getUtility()) {
+            for(int i = 0; i < game.getSuccessors().size(); i++) {
+                if (game.getSuccessors().get(chosen_one).getUtility() >= game.getSuccessors().get(i).getUtility()) {
                      chosen_one = i;
                 }
             }
