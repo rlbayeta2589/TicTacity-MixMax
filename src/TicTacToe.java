@@ -12,6 +12,7 @@ public class TicTacToe extends JFrame implements ActionListener{
 	private static String TURN2 = "O";
 	private static String TURN = TURN1;
 	private static int TURN_COUNT = 0;
+	private static int PLAYER;
 
 	public TicTacToe(String title){
 		super(title);
@@ -34,12 +35,24 @@ public class TicTacToe extends JFrame implements ActionListener{
         
         System.out.println(init.value(0, -100, 100));
 
+
 		setPreferredSize(new Dimension(300, 300));
 		pack();
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 		setResizable(false);
+
+
+        PLAYER = askFirstTurn();
+	}
+
+	public int askFirstTurn(){
+		String[] val = { "Player", "AI"};
+   		String init = "Player";
+        	"TURN", JOptionPane.QUESTION_MESSAGE, null, val, init);
+
+    	return selection=="Player" ? 1 : -1;
 	}
 
 	public void actionPerformed(ActionEvent e){
@@ -70,6 +83,7 @@ public class TicTacToe extends JFrame implements ActionListener{
 
 			if (response == JOptionPane.YES_OPTION) {
 				RESTART();
+				PLAYER = askFirstTurn();
 			}
 
 			else if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION) {
