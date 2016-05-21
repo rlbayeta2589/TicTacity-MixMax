@@ -50,7 +50,7 @@ public class TicTacToe extends JFrame implements ActionListener{
 	public int askFirstTurn(){
 		String[] val = { "Player", "AI"};
    		String init = "Player";
-    	String selection = JOptionPane.showInputDialog(this, "Who will take the first turn?",
+    	Object selection = JOptionPane.showInputDialog(this, "Who will take the first turn?",
         	"TURN", JOptionPane.QUESTION_MESSAGE, null, val, init);
 
     	return selection=="Player" ? 1 : -1;
