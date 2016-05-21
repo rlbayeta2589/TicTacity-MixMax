@@ -23,6 +23,35 @@ public class TicTacity {
             { 0, 0, 0 }        
         };
 
+
+        State game;
+        
+        game = new State(tiles, -1);
+
+        System.out.println(game.value(0, -1000, 1000));
+
+        chosen_one = 0;
+        for(int i = 1; i < game.getSuccessors().size(); i++) {
+            if (game.getSuccessors().get(chosen_one).getUtility() >= game.getSuccessors().get(i).getUtility()) {
+                 chosen_one = i;
+            }
+        }
+
+        next_state =  game.getSuccessors().get(chosen_one);
+
+        x = (int) next_state.getTurn().getX();
+        y = (int) next_state.getTurn().getY();
+        
+        tiles[x][y] = -1;
+
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                System.out.print(tiles[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+
         while(true) {
             System.out.println("YOUR TURN");
             System.out.print("X: ");
@@ -33,22 +62,12 @@ public class TicTacity {
 
             tiles[x][y] = 1;
 
-
-            State game = new State(tiles, null, new Point(x,y), 1);
+            game = new State(tiles, null, new Point(x,y), 1);
 
             System.out.println(game.value(0, -1000, 1000));
 
-        
-            System.out.println("POSSIBLE MOVES!");
-
-            for(State child : game.getSuccessors()) {
-                child.print();
-            }
-            System.out.println();
-        
-
             chosen_one = 0;
-            for(int i = 0; i < game.getSuccessors().size(); i++) {
+            for(int i = 1; i < game.getSuccessors().size(); i++) {
                 if (game.getSuccessors().get(chosen_one).getUtility() >= game.getSuccessors().get(i).getUtility()) {
                      chosen_one = i;
                 }

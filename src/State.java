@@ -10,9 +10,11 @@ public class State{
 	private int     utility;
     private Point   turn;
 
-	public State(int[][] state, State parent) {
+	public State(int[][] state, int player) {
 	    this.state = new int[3][3];
-		this.parent = parent;
+		this.parent = null;
+	    this.player = player;
+        this.type   = player; 
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -65,8 +67,10 @@ public class State{
     }
 
     private int advantage(int x, int o){
-        if(x==3) return 2;
-        if(o==3) return -2;
+        if(x==3) return 3;
+        if(o==3) return -3;
+        if(x>1 && o==0) return 2;
+        if(o>1 && x==0) return -2;
         if(x>0 && o==0) return 1;
         if(o>0 && x==0) return -1;
         else return 0;
@@ -148,16 +152,19 @@ public class State{
         if(value>0) adv_X+=value;
             if(value<0) adv_O+=(value*-1);
 
-        if(adv_X == adv_O) return adv_X*player*-1; //o player * -1 // basta kung sino na yung titira
-                                            //siya yung may advantage
+        if(adv_X == adv_O) return adv_X*player*-1;
+
         return adv_X > adv_O ? adv_X : adv_O*-1;
     }
 
     public int value(int depth, int alpha, int beta) {
         if(getType() ==  0) {
             int s = evaluateBoard();
-            parent.utility = s;
-            System.out.println("EVAL" + s);
+//System.out.println("EVAL " + s);
+
+            if(parent != null)
+                parent.utility = s;
+
             return s;
         }
 

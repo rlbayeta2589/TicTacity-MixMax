@@ -7,15 +7,28 @@ import java.io.*;
 public class TicTacToe extends JFrame implements ActionListener{
 	
     private static JFrame frame;
-	private static Tiles[][] tiles;
+	private Tiles[][] tiles;
 	private static String TURN1 = "X";
 	private static String TURN2 = "O";
 	private static String TURN = TURN1;
 	private static int TURN_COUNT = 0;
 	private static int PLAYER;
+    private State GAME;
+    private Point action;
+    
+    private String PLAYER_TOKEN = TURN1;
+    private String AI_TOKEN = TURN2;
 
 	public TicTacToe(String title){
 		super(title);
+
+	    int best_state_index, x, y;
+	    int temp[][] = {
+            { 0, 0, 0 },
+            { 0, 0, 0 },
+            { 0, 0, 0 }        
+        };
+        State best_state;
 
 		tiles = new Tiles[3][3];
 		frame = this;
@@ -30,12 +43,7 @@ public class TicTacToe extends JFrame implements ActionListener{
 				container.add(tiles[i][j]);
 			}
 		}
-
-        State init = getGameState();
         
-        System.out.println(init.value(0, -100, 100));
-
-
 		setPreferredSize(new Dimension(300, 300));
 		pack();
 		setLocationRelativeTo(null);
@@ -43,8 +51,34 @@ public class TicTacToe extends JFrame implements ActionListener{
 		setVisible(true);
 		setResizable(false);
 
-
         PLAYER = askFirstTurn();
+
+        if (PLAYER == -1) {
+            AI_TOKEN = TURN1;
+            PLAYER_TOKEN = TURN2;
+
+            GAME = new State(temp, -1);
+
+            GAME.value(0, -1000, 1000);
+
+            best_state_index = 0;
+            for(int i = 0; i < GAME.getSuccessors().size(); i++) {
+                if (GAME.getSuccessors().get(best_state_index).getUtility() >= GAME.getSuccessors().get(i).getUtility()) {
+                     best_state_index = i;
+                }
+            }
+
+            best_state =  GAME.getSuccessors().get(best_state_index);
+
+            x = (int) best_state.getTurn().getX();
+            y = (int) best_state.getTurn().getY();
+            
+            tiles[x][y].setText(AI_TOKEN);
+            
+            
+            TURN_COUNT++;
+        }
+        
 	}
 
 	public int askFirstTurn(){
@@ -58,33 +92,75 @@ public class TicTacToe extends JFrame implements ActionListener{
 
 	public void actionPerformed(ActionEvent e){
 		Tiles source = (Tiles)e.getSource();
-		int response;
+
 		String winner;
-		boolean GAME_OVER = false;
+		int best_state_index, x, y;
+		State best_state;
+		boolean game_over;
 
 		if(source.getText()!="") return;
 
-		source.setText(TURN);
+		source.setText(PLAYER_TOKEN);
 		TURN_COUNT++;
 
 		winner = isGoalState(source.getXCoord(), source.getYCoord());
+		action = new Point(source.getXCoord(), source.getYCoord());
 
-		if( winner != "" ) {
+        game_over = checkGame(winner);
+
+        if(!game_over) {
+            GAME = new State(getGameState(), null, action, 1);
+            GAME.value(0, -1000, 1000);
+
+            best_state_index = 0;
+            for(int i = 0; i < GAME.getSuccessors().size(); i++) {
+                if (GAME.getSuccessors().get(best_state_index).getUtility() >= GAME.getSuccessors().get(i).getUtility()) {
+                        
+                     best_state_index = i;
+                }
+            }
+
+            System.out.println("POSSIBLE MOVES");
+            for (State s : GAME.getSuccessors()) {
+                s.print();
+            }
+            
+            System.out.println(best_state_index);
+
+
+            best_state = GAME.getSuccessors().get(best_state_index);
+
+            x = (int) best_state.getTurn().getX();
+            y = (int) best_state.getTurn().getY();
+            
+            tiles[x][y].setText(AI_TOKEN);
+    		TURN_COUNT++;
+
+            winner = isGoalState(x, y);
+
+            checkGame(winner);
+        }
+	}
+
+    public boolean checkGame(String winner) {
+		int response;
+		boolean game_over = false;
+
+        if( winner != "" ) {
 			JOptionPane.showMessageDialog(frame,"WINNER : "+winner, "TICTACITY", JOptionPane.INFORMATION_MESSAGE);
-			GAME_OVER = true;
+			game_over = true;
 		}
 
 		else if (TURN_COUNT==9){
 			JOptionPane.showMessageDialog(frame, "DRAW" , "TICTACITY", JOptionPane.INFORMATION_MESSAGE);
-			GAME_OVER = true;
+			game_over = true;
 		}
 		
-		if(GAME_OVER){
+		if(game_over){
 			response = JOptionPane.showConfirmDialog(frame,"Do you want to play again?", "TICTACITY", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 			if (response == JOptionPane.YES_OPTION) {
-				RESTART();
-				PLAYER = askFirstTurn();
+				restart();
 			}
 
 			else if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION) {
@@ -92,11 +168,8 @@ public class TicTacToe extends JFrame implements ActionListener{
 			}
 		}
 
-		TURN = TURN == TURN1
-			? TURN2
-			: TURN1;
-
-	}
+        return game_over;
+    }
 
 	public String isGoalState(int x, int y){
 		if( tiles[x][0].getText() == tiles[x][1].getText() && tiles[x][0].getText() == tiles[x][2].getText() ) return tiles[x][y].getText();
@@ -110,40 +183,74 @@ public class TicTacToe extends JFrame implements ActionListener{
 		return "";
 	}
 
-	public static void RESTART() {
+	public void restart() {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				tiles[i][j].setText("");
 			}
 		}
+
 		TURN_COUNT = 0;
-		TURN = TURN1;
+		PLAYER = askFirstTurn();
+
+	    int best_state_index, x, y;
+	    int temp[][] = {
+            { 0, 0, 0 },
+            { 0, 0, 0 },
+            { 0, 0, 0 }        
+        };
+
+        if (PLAYER == -1) {
+            AI_TOKEN = TURN1;
+            PLAYER_TOKEN = TURN2;
+
+            GAME = new State(temp, PLAYER);
+
+            GAME.value(0, -1000, 1000);
+
+            best_state_index = 0;
+            for(int i = 0; i < GAME.getSuccessors().size(); i++) {
+                if (GAME.getSuccessors().get(best_state_index).getUtility() >= GAME.getSuccessors().get(i).getUtility()) {
+                     best_state_index = i;
+                }
+            }
+
+            State best_state =  GAME.getSuccessors().get(best_state_index);
+
+            x = (int) best_state.getTurn().getX();
+            y = (int) best_state.getTurn().getY();
+            
+            tiles[x][y].setText(AI_TOKEN);
+            
+            TURN_COUNT++;
+        }
+
+        else {
+            AI_TOKEN = TURN2;
+            PLAYER_TOKEN = TURN1;
+        }
 	}
 
-	public State getGameState(){
+	public int[][] getGameState(){
 		int[][] temp = new int[3][3];
 
 		for (int i=0 ; i<3 ; i++ ){
 			for(int j=0; j<3 ; j++){
-				switch(tiles[i][j].getText()){
-					case "X":
-						temp[i][j] = 1;
-						break;
-					case "O":
-						temp[i][j] = -1;
-						break;
-					case "":
-						temp[i][j] = 0;
-						break;
+				if(tiles[i][j].getText() == PLAYER_TOKEN){
+                    temp[i][j] = 1;
 				}
+
+                else if(tiles[i][j].getText() == AI_TOKEN) {
+                    temp[i][j] = -1;
+                }
+
+                else {
+                    temp[i][j] = 0;
+                }
 			}
 		}
 
-		return new State(temp, null);
-	}
-
-	public void AlphaBetaPruning(){
-
+		return temp;
 	}
 
 	public static void main(String[] args) {
