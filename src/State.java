@@ -56,6 +56,8 @@ public class State{
     }
 
     private int advantage(int x, int o){
+        if(x==3) return 1;
+        if(o==3) return -1;
         if(x>0 && o==0) return 1;
         if(o>0 && x==0) return -1;
         else return 0;
