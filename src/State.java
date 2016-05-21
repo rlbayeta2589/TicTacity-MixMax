@@ -2,13 +2,13 @@ import java.util.*;
 import java.awt.*;
 
 public class State{
+    private LinkedList<State> successors;
 	private State   parent;
 	private int[][] state;
 	private int     player;
 	private int     type;
 	private int     utility;
     private Point   turn;
-    private boolean is_goal_state;
 
 	public State(int[][] state, State parent) {
 	    this.state = new int[3][3];
@@ -27,7 +27,7 @@ public class State{
         this.state  = new int[3][3];
 		this.parent = parent;
 	    this.player = player;
-        this.type   = player;
+        this.type   = player; //or *-1?
         this.turn   = action;
 
         x = (int) action.getX();
@@ -55,14 +55,19 @@ public class State{
         return type;
     }
 
-    public int getValue() {
-        return utility;
-    }
-
     public int value(int depth, int alpha, int beta) {
-        if(getType() ==  0) return getValue();
-        if(getType() ==  1) return maxValue(depth, alpha, beta);
-        if(getType() == -1) return minValue(depth, alpha, beta);
+        if(getType() ==  0) {
+            parent.utility = utility;
+            return utility;
+        }
+
+        if(getType() ==  1) {
+            return maxValue(depth, alpha, beta);
+        }
+        
+        if(getType() == -1) {
+            return minValue(depth, alpha, beta);
+        }
 
         return 0;
     }
@@ -70,7 +75,7 @@ public class State{
     public int maxValue(int depth, int alpha, int beta) {
         int value = -100;
 
-        for(State next : successors()) {
+        for(State next : generateSuccessors()) {
             value = Math.max(value, next.value(depth+1, alpha, beta));
 
             if(value >= beta) return value;
@@ -83,36 +88,40 @@ public class State{
     public int minValue(int depth, int alpha, int beta) {
         int value = 100;
 
-        for(State next : successors()) {
+        for(State next : generateSuccessors()) {
             value = Math.min(value, next.value(depth+1, alpha, beta));
 
-            if(value >= alpha) return value;
-            beta = Math.max(beta, value);
+            if(value <= alpha) return value;
+            beta = Math.min(beta, value);
         }
 
         return value;
     }
 
-    public LinkedList<State> successors() {
-        LinkedList<State> children  =  new LinkedList<State>();
+    private LinkedList<State> generateSuccessors() {
         LinkedList<Point> actions   =  new LinkedList<Point>();
         int x, y, player;
 
-        actions = availableMoves();
-        
+        actions     =  availableMoves();
+        successors  =  new LinkedList<State>();
+
         if (actions.size() > 0) {
-            player = changeType();
+            player = changePlayer();
         
             for (Point action : actions) {
                 State child = new State(state, this, action, player);
 
-                children.add(child);
+                successors.add(child);
 
                 child.print();
             }
         }
 
-        return children;
+        return successors;
+    }
+
+    public LinkedList<State> getSuccessors() {
+        return successors;
     }
 
     public int winner(int x, int y) {
@@ -127,8 +136,8 @@ public class State{
 		return 0;
     }
 
-    public int changeType() {
-        return type *= -1;
+    public int changePlayer() {
+        return player *= -1;
     }
 
     public LinkedList<Point> availableMoves() {
@@ -152,6 +161,7 @@ public class State{
 			System.out.println();
 		}
 			System.out.println("TURN " + player + ": @ " + turn.getX() + ", " + turn.getY());
+			System.out.println(type == 0 ? "UTILITY NODE" : type == 1 ? "MAXIMIZATION" : "MINIMIZATION");
 			System.out.println("UTILITY: " + utility);
             System.out.println();
 	}

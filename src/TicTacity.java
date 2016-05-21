@@ -20,7 +20,6 @@ public class TicTacity {
         };
 
 
-//        while(1) {
             System.out.println("YOUR TURN");
             System.out.print("X: ");
             x = scanner.nextInt();
@@ -28,10 +27,19 @@ public class TicTacity {
             System.out.print("Y: ");
             y = scanner.nextInt();
 
-            State game = new State(tiles, null, new Point(x,y), 1);
+            State game = new State(tiles, null, new Point(x,y), -1);
 
             System.out.println(game.value(0, -100, 100));
-//        }
+
+            System.out.println();
+            System.out.println();
+            System.out.println();
+
+            for(State s : game.getSuccessors()) {
+                s.print();
+            }
+
+            
         
     }
 }
