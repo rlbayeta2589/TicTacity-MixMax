@@ -2,67 +2,146 @@ import java.util.*;
 import java.awt.*;
 
 public class State{
-	private LinkedList<State>   descendants;
-	private LinkedList<Point>	action;
-	private State               parent;
-	private int[][]				state;
-	private String 				id = "";
+	private State   parent;
+	private int[][] state;
+	private int     player;
+	private int     type;
+	private int     utility;
+    private Point   turn;
+    private boolean is_goal_state;
 
 	public State(int[][] state, State parent) {
-		this.state = state;
+	    this.state = new int[3][3];
 		this.parent = parent;
 
-		action = new LinkedList<Point>();
-
-		for (int i=0 ; i<3 ; i++ ){
-			for(int j=0; j<3 ; j++){
-				id += state[i][j];
-				if(state[i][j]==0){
-					action.add(new Point(i,j));
-				}
-			}
-		}
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                this.state[i][j] = state[i][j];
+            }
+        }
 	}
 
-    public LinkedList<State> getDescendants() {
-        return descendants;
+    public State(int[][] state, State parent, Point action, int player) {
+        int i, j, x, y;
+
+        this.state  = new int[3][3];
+		this.parent = parent;
+	    this.player = player;
+        this.type   = player;
+        this.turn   = action;
+
+        x = (int) action.getX();
+        y = (int) action.getY();
+
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < 3; j++) {
+                if( x == i && j == y) this.state[i][j] = player;
+                else this.state[i][j] = state[i][j];
+            }
+        }
+
+        if (winner(x,y) != 0) {
+            type = 0;
+            utility = player;
+        }
+
     }
 
     public State getParent() {
         return parent;
     }
 
-    public LinkedList<Point> getAction(){
-    	return action;
+    public int getType() {
+        return type;
     }
 
-    public State getNextState(Point action, int player) {
-    	int x = (int) action.getX(), y = (int) action.getY();
-
-    	int[][] new_state = new int[3][3];
-
-    	for(int i=0;i<3;i++){
-    		new_state[i] = state[i].clone();
-    	}
-
-    	new_state[x][y] = (player==1 ? -1 : 1);
-
-    	return new State(new_state,this);
+    public int getValue() {
+        return utility;
     }
 
-    public int getValue(int turn_count){
-    	for(int i=0;i<3;i++){
-    		if(state[i][0]==state[i][1] && state[i][1]==state[i][2] && state[i][0]!=0) return state[i][0];
-    	}
+    public int value(int depth, int alpha, int beta) {
+        if(getType() ==  0) return getValue();
+        if(getType() ==  1) return maxValue(depth, alpha, beta);
+        if(getType() == -1) return minValue(depth, alpha, beta);
 
-    	for(int i=0;i<3;i++){
-    		if(state[0][i]==state[1][i] && state[1][i]==state[2][i] && state[0][i]!=0) return state[0][i];
-    	}
+        return 0;
+    }
 
-		if(state[0][0]==state[1][1] && state[1][1]==state[2][2] && state[1][1]!=0) return state[1][1];
-		if(state[0][2]==state[1][1] && state[1][1]==state[2][0] && state[1][1]!=0) return state[1][1];
+    public int maxValue(int depth, int alpha, int beta) {
+        int value = -100;
 
-		return turn_count==9 ? 0 : -99;
+        for(State next : successors()) {
+            value = Math.max(value, next.value(depth+1, alpha, beta));
+
+            if(value >= beta) return value;
+            alpha = Math.max(alpha, value);
+        }
+
+        return value;
+    }
+
+    public int minValue(int depth, int alpha, int beta) {
+        int value = 100;
+
+        for(State next : successors()) {
+            value = Math.min(value, next.value(depth+1, alpha, beta));
+
+            if(value >= alpha) return value;
+            beta = Math.max(beta, value);
+        }
+
+        return value;
+    }
+
+    public LinkedList<State> successors() {
+        LinkedList<State> children  =  new LinkedList<State>();
+        LinkedList<Point> actions   =  new LinkedList<Point>();
+        int x, y, player;
+
+        actions = availableMoves();
+        
+        if (actions.size() > 0) {
+            player = changeType();
+        
+            for (Point action : actions) {
+                State child = new State(state, this, action, player);
+
+                children.add(child);
+
+                child.print();
+            }
+        }
+
+        return children;
+    }
+
+    public int winner(int x, int y) {
+        if( state[x][0] == state[x][1] && state[x][0] == state[x][2] ) return state[x][y];
+		if( state[0][y] == state[1][y] && state[0][y] == state[2][y] ) return state[x][y];
+
+		if( (x+y) % 2 ==0 ){
+			if ( x+y==2 && state[0][2] == state[1][1] && state[0][2] == state[2][0] ) return state[x][y];
+			if ( x==y && state[0][0] == state[1][1] && state[0][0] == state[2][2] ) return state[x][y];
+		}
+
+		return 0;
+    }
+
+    public int changeType() {
+        return type *= -1;
+    }
+
+    public LinkedList<Point> availableMoves() {
+        LinkedList<Point> actions = new LinkedList<Point>();
+        int i, j;
+
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < 3; j++) {
+                if(state[i][j] == 0) actions.add(new Point(i,j));
+            }
+        }
+
+        return actions;
     }
 
 	public void print() {
@@ -72,6 +151,8 @@ public class State{
 			}
 			System.out.println();
 		}
-			System.out.println();
+			System.out.println("TURN " + player + ": @ " + turn.getX() + ", " + turn.getY());
+			System.out.println("UTILITY: " + utility);
+            System.out.println();
 	}
 }

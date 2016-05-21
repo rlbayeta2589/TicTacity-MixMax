@@ -6,7 +6,7 @@ import java.io.*;
 
 public class TicTacToe extends JFrame implements ActionListener{
 	
-	private static JFrame frame;
+    private static JFrame frame;
 	private static Tiles[][] tiles;
 	private static String TURN1 = "X";
 	private static String TURN2 = "O";
@@ -30,8 +30,11 @@ public class TicTacToe extends JFrame implements ActionListener{
 			}
 		}
 
-		tiles[2][2].doClick();
-		AlphaBetaPruning();
+        tiles[1][1].doClick();
+
+        State init = getGameState();
+        
+        System.out.println(init.value(0, -100, 100));
 
 		setPreferredSize(new Dimension(300, 300));
 		pack();
@@ -80,7 +83,6 @@ public class TicTacToe extends JFrame implements ActionListener{
 			? TURN2
 			: TURN1;
 
-		getGameState().print();
 	}
 
 	public String isGoalState(int x, int y){
@@ -96,9 +98,9 @@ public class TicTacToe extends JFrame implements ActionListener{
 	}
 
 	public static void RESTART() {
-		for (int x = 0; x < 3; x++) {
-			for (int y = 0; y < 3; y++) {
-				tiles[x][y].setText("");
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				tiles[i][j].setText("");
 			}
 		}
 		TURN_COUNT = 0;
@@ -107,6 +109,7 @@ public class TicTacToe extends JFrame implements ActionListener{
 
 	public State getGameState(){
 		int[][] temp = new int[3][3];
+
 		for (int i=0 ; i<3 ; i++ ){
 			for(int j=0; j<3 ; j++){
 				switch(tiles[i][j].getText()){
@@ -114,7 +117,7 @@ public class TicTacToe extends JFrame implements ActionListener{
 						temp[i][j] = 1;
 						break;
 					case "O":
-						temp[i][j] = 2;
+						temp[i][j] = -1;
 						break;
 					case "":
 						temp[i][j] = 0;
@@ -122,32 +125,11 @@ public class TicTacToe extends JFrame implements ActionListener{
 				}
 			}
 		}
-		return new State(temp,null);
+
+		return new State(temp, null);
 	}
 
 	public void AlphaBetaPruning(){
-		ArrayList<State> game_tree = new ArrayList<State>();
-
-		int turn_count = TURN_COUNT;
-
-		State init = getGameState();
-
-		Point curr_action;
-
-		int player = 0;
-
-		while(turn_count!=9){
-			player = turn_count%2;
-			init = init.getNextState(init.getAction().removeFirst(),player);
-			init.print();
-
-			System.out.println(init.getValue(turn_count));
-
-			turn_count++;
-
-
-
-		}
 
 	}
 
