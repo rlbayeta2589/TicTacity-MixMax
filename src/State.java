@@ -68,6 +68,7 @@ public class State{
         int pO = 0; 
         int value;
 
+        //rows
         for (int i = 0; i < 3; ++i) {
             pX = 0;
             pO = 0;
@@ -79,13 +80,14 @@ public class State{
                 }
             } 
 
-            value = advantage(x,o);
+            value = advantage(pX,pO);
 
             if(value==1) adv_X++;
             if(value==-1) adv_O++;
 
         }
 
+        //cols
         for (int j = 0; j < 3; ++j) {
             pX = 0;
             pO = 0;
@@ -97,7 +99,7 @@ public class State{
                 }
             }
 
-            value = advantage(x,o);
+            value = advantage(pX,pO);
 
             if(value==1) adv_X++;
             if(value==-1) adv_O++;
@@ -114,7 +116,7 @@ public class State{
             }
         }
 
-         value = advantage(x,o);
+         value = advantage(pX,pO);
 
         if(value==1) adv_X++;
         if(value==-1) adv_O++;
@@ -130,7 +132,7 @@ public class State{
             }
         }
 
-         value = advantage(x,o);
+        value = advantage(pX,pO);
 
         if(value==1) adv_X++;
         if(value==-1) adv_O++;
